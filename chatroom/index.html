@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+        form input { border: 0; padding: 10px; width: 84%; margin-right: .5%; }
+        form button { width: 15%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+        #room { background: #798EB8; padding: 3px; position: fixed; font-size:20px; top: 0; width: 100%; color: #fff; }
+        
+        #messages { list-style-type: none; margin: 40px 0 0 0; padding: 0; }
+        #messages li { padding: 5px 10px; }
+        #messages li:nth-child(odd) { background: #eee; }
+        #room-list { list-style-type: none; margin: 40px 0 0 0; padding: 0; }
+        #room-list li { padding: 5px 10px; }
+        #room-list li:nth-child(odd) { background: #eee; }
+        .msgs{ display: none; }
+        .rooms{ display: none; }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+    <script>
+        $(function(){
+            const socket = io();
+            let name, room;
+            $('#name-form').submit(()=>{
+                // send message
+                name =  $('#m1').val();
+                socket.emit('user', name)    
+                $('.name').hide();
+                $('.rooms').show();
+                $('#room').text(`Hi ${name}`);
+                return false;
+            })
+
+            $("#room-form").submit(()=>{
+                room = $('#m2').val()
+                socket.emit("new room", room);
+                $('.rooms').hide();
+                $('.msgs').show();
+                $('#room').text(`(${name}), You are chatting in room: ${room}`);
+                $('#m2').val('');
+                return false;
+            })
+
+            $("#msg-form").submit(()=>{
+                socket.emit("chat message", {name, room, msg:$('#m3').val() });
+                $('#m3').val('');
+                return false;
+            })
+            
+            socket.on('chat message', (msg)=>{
+                $('#messages').append($('<li>').text(msg));
+            })
+        
+            socket.on("rooms", (data)=>{
+                console.log(data)
+            })
+        })
+        </script>
+    </head>
+    <body>
+        <div id="room">Welcome Anyomous!</div>
+        <form class="name" id="name-form">
+            <input id="m1" autocomplete="off" /><button>Enter a username</button>
+        </form>
+        <ul id="room-list" class="rooms"></ul>
+        <form class="rooms" id="room-form" action="">
+            <input id="m2" autocomplete="off" /><button>Create and join a new room</button>
+        </form>
+        <div>
+            <ul id="messages" class="msgs"></ul>
+            <form class="msgs" id="msg-form" action="">
+                <input id="m3" autocomplete="off" /><button>Send</button>
+            </form>
+        </div>
+    </body>
+    </html>
