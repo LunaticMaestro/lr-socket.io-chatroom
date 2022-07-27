@@ -3,7 +3,7 @@ Project made during upskilling. Chatrooms build using nodejs.
 
 ## Preview
 
-![output](.resource/preview.gif)
+![output](https://github.com/LunaticMaestro/lr-socket.io-chatroom/blob/main/.resources/preview.gif)
 
 ## Instructions to use
 
